@@ -10,10 +10,10 @@ export function Header() {
       <div className="container flex h-14 items-center">
         <nav className="flex items-center space-x-4 lg:space-x-6 mx-6">
           <Link
-              to="/feature-flags/demo"
+              to="/feature-flags/home"
               className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
           >
-            Demo
+            Home
           </Link>
           <Link to="/feature-flags/dashboard" className="text-sm font-medium transition-colors hover:text-primary">
             Dashboard

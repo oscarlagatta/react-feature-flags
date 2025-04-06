@@ -1,7 +1,8 @@
 import {Button} from "@/components/ui/button.tsx";
 import {Feature} from "@/lib/feature-flags/guards.tsx";
+import {Link} from "react-router";
 
-export default function DemoPage() {
+export default function HomePage() {
     return (
         <div className="w-full max-w-sm md:max-w-3xl">
             <div className="container py-10">
@@ -60,9 +61,9 @@ export default function DemoPage() {
                         This application uses feature flags to control features, routes, and components. To learn
                         more about feature
                         flags and how to use them, visit the{" "}
-                        <a href="/features" className="font-medium underline">
+                        <Link to="/feature-flags/features" className="font-medium underline">
                             documentation page
-                        </a>
+                        </Link>
                         .
                     </p>
                     <p>

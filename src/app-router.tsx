@@ -2,7 +2,7 @@ import {BrowserRouter, Navigate, Route, Routes} from "react-router";
 import FeatureFlagLayout from "@/feature-flags/layout/feature-flag-layout.tsx";
 import {FeatureFlag, FeatureFlagProvider} from "@/lib/feature-flags";
 import DashboardPage from "@/feature-flags/pages/dashboard/dashboard-page.tsx";
-import DemoPage from "@/feature-flags/demo/demo-page.tsx";
+import HomePage from "@/feature-flags/home/home-page.tsx";
 import DocumentationPage from "@/feature-flags/pages/feature-flags/documentation/documentation-page.tsx";
 import ManageFeatureFlagsPage from "@/feature-flags/pages/feature-flags/manage/manage-page.tsx";
 import {FeatureFlagsDocsPage} from "@/feature-flags/pages/features/features-page.tsx";
@@ -55,7 +55,7 @@ export const AppRouter = () => {
                 <Routes>
                     <Route path='/feature-flags' element={<FeatureFlagLayout/>}>
 
-                        <Route index element={<DemoPage />} />
+                        <Route index element={<HomePage />} />
                         <Route path='dashboard' element={<DashboardPage />}/>
                         <Route path='documentation' element={<DocumentationPage />}/>
                         <Route path='manage' element={<ManageFeatureFlagsPage />}/>
