@@ -16,7 +16,7 @@ function AccessDenied() {
         You don't have access to the settings page. This feature is currently disabled in your environment.
       </p>
       <Link to="/">
-        <Button>Return to Dashboard</Button>
+        <Button>Return to Feature Flags' Home Page</Button>
       </Link>
     </div>
   )
