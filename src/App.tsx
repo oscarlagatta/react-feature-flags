@@ -1,12 +1,11 @@
-import {Button} from "@/components/ui/button.tsx";
+import {AppRouter} from "@/app-router.tsx";
+
+
 
 function App() {
   return (
-    <>
-    <h1 className='text-3xl underline font-bold' >Hello Feature Flags</h1>
-      <Button variant='default' >Button</Button>
-    </>
-  )
+        <AppRouter />
+        )
 }
 
 export default App
