@@ -1,6 +1,12 @@
 import {BrowserRouter, Navigate, Route, Routes} from "react-router";
 import FeatureFlagLayout from "@/feature-flags/layout/feature-flag-layout.tsx";
 import {FeatureFlag, FeatureFlagProvider} from "@/lib/feature-flags";
+import DashboardPage from "@/feature-flags/pages/dashboard/dashboard-page.tsx";
+import DemoPage from "@/feature-flags/demo/demo-page.tsx";
+import DocumentationPage from "@/feature-flags/pages/feature-flags/documentation/documentation-page.tsx";
+import ManageFeatureFlagsPage from "@/feature-flags/pages/feature-flags/manage/manage-page.tsx";
+import {FeatureFlagsDocsPage} from "@/feature-flags/pages/features/features-page.tsx";
+import SettingsPage from "@/feature-flags/pages/settings/settings-page.tsx";
 
 const initialFlags: FeatureFlag[] = [
     {
@@ -45,18 +51,22 @@ const initialFlags: FeatureFlag[] = [
 export const AppRouter = () => {
     return (
         <FeatureFlagProvider initialFlags={initialFlags}>
-        <BrowserRouter>
-            <Routes>
-                <Route path='/feature-flags' element={<FeatureFlagLayout />}>
-                    <Route path='login' element={<h1>Hello login</h1>} />
-                    <Route path='register' element={<h1>Hello login</h1>} />
-                </Route>
+            <BrowserRouter>
+                <Routes>
+                    <Route path='/feature-flags' element={<FeatureFlagLayout/>}>
 
+                        <Route index element={<DemoPage />} />
+                        <Route path='dashboard' element={<DashboardPage />}/>
+                        <Route path='documentation' element={<DocumentationPage />}/>
+                        <Route path='manage' element={<ManageFeatureFlagsPage />}/>
+                        <Route path='features' element={<FeatureFlagsDocsPage />}/>
+                        <Route path='settings' element={<SettingsPage />}/>
+                    </Route>
 
-                <Route path="/" element={<Navigate to="/feature-flags" />} />
-                <Route path="*" element={<Navigate to="/feature-flags" />} />
-            </Routes>
-                </BrowserRouter>
-            </FeatureFlagProvider>
+                    <Route path="/" element={<Navigate to="/feature-flags"/>}/>
+                    <Route path="*" element={<Navigate to="/feature-flags"/>}/>
+                </Routes>
+            </BrowserRouter>
+        </FeatureFlagProvider>
     )
 }

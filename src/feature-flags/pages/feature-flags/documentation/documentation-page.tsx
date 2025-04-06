@@ -3,7 +3,7 @@ import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs"
 import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert"
 import {InfoIcon} from "lucide-react"
 
-export default function FeatureFlagsDocumentationPage() {
+export default function DocumentationPage() {
     return (
         <div className="container py-10">
             <h1 className="text-3xl font-bold mb-2">Feature Flags Documentation</h1>

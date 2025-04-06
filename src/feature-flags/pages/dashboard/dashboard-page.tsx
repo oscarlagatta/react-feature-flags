@@ -15,7 +15,7 @@ import {
 } from "lucide-react"
 import { Button } from "@/components/ui/button.tsx"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs.tsx"
-import {Link, Outlet} from "react-router"
+import {Link} from "react-router"
 import { Feature } from "@/lib/feature-flags/guards.tsx"
 import { FeatureFlagStatus } from "@/components/feature-flag-status.tsx"
 import { DashboardHeader } from "@/components/dashboard/header.tsx"
@@ -433,7 +433,7 @@ export default function DashboardPage() {
               </Link>
             </CardFooter>
           </Card>
-          <Outlet />
+          {/*<Outlet />*/}
         </div>
       </div>
   )

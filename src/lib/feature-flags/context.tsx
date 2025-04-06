@@ -1,3 +1,5 @@
+"use client"
+
 import { createContext, useContext, useEffect, useState } from "react"
 import type { FeatureFlag, FeatureFlagContextType, FeatureFlagProviderProps } from "./types"
 
@@ -7,40 +9,100 @@ import defaultFlagsData from "./feature-flags.json"
 // Create the context
 const FeatureFlagContext = createContext<FeatureFlagContextType | undefined>(undefined)
 
+// Helper function to safely access localStorage
+const safeLocalStorage = {
+  getItem: (key: string): string | null => {
+    try {
+      if (typeof window !== "undefined") {
+        return localStorage.getItem(key)
+      }
+    } catch (e) {
+      console.error("Error accessing localStorage:", e)
+    }
+    return null
+  },
+  setItem: (key: string, value: string): boolean => {
+    try {
+      if (typeof window !== "undefined") {
+        localStorage.setItem(key, value)
+        return true
+      }
+    } catch (e) {
+      console.error("Error setting localStorage:", e)
+    }
+    return false
+  },
+}
+
+// Helper to get environment
+const getEnvironment = () => {
+  try {
+    // For Vite, use import.meta.env
+    if (typeof import.meta !== "undefined" && import.meta.env) {
+      return import.meta.env.VITE_ENV || import.meta.env.MODE
+    }
+    // Fallback
+    return "development"
+  } catch (e) {
+    console.error("Error getting environment:", e)
+    return "development"
+  }
+}
+
 // Update the FeatureFlagProvider component to include the addFlag function
 export const FeatureFlagProvider = ({ children, initialFlags }: FeatureFlagProviderProps) => {
-  const [flags, setFlags] = useState<FeatureFlag[]>(
-      initialFlags ||
-      Object.values(defaultFlagsData).map((flag) => {
-        if (!["feature", "route", "component"].includes(flag.type)) {
-          throw new Error(`Invalid flag type: ${flag.type}`)
-        }
-        return { ...flag } as FeatureFlag
-      }),
-  )
+  // Initialize with empty array first to avoid undefined errors
+  const [flags, setFlags] = useState<FeatureFlag[]>([])
   const [isManagementVisible, setIsManagementVisible] = useState(false)
+  const [isInitialized, setIsInitialized] = useState(false)
 
-  // Check if we're in a non-production environment
+  // Initialize flags from props or default data
   useEffect(() => {
-    const env = process.env.NEXT_PUBLIC_VERCEL_ENV || process.env.NODE_ENV
-    const allowedEnvs = ["development", "test", "preview", "uat"]
-    setIsManagementVisible(allowedEnvs.includes(env || ""))
+    try {
+      const flagsData =
+          initialFlags ||
+          Object.values(defaultFlagsData).map((flag) => {
+            if (!["feature", "route", "component"].includes(flag.type)) {
+              console.warn(`Invalid flag type: ${flag.type}`)
+              return { ...flag, type: "feature" } as FeatureFlag
+            }
+            return { ...flag } as FeatureFlag
+          })
 
-    // Load flags from localStorage if available
-    const storedFlags = localStorage.getItem("featureFlags")
-    if (storedFlags) {
-      try {
-        setFlags(JSON.parse(storedFlags))
-      } catch (e) {
-        console.error("Failed to parse stored feature flags", e)
+      setFlags(flagsData)
+
+      // Check if we're in a non-production environment
+      const env = getEnvironment()
+      const allowedEnvs = ["development", "test", "preview", "uat"]
+
+      // Always enable management in development for easier testing
+      setIsManagementVisible(allowedEnvs.includes(env) || env === "development")
+
+      // Load flags from localStorage if available
+      const storedFlags = safeLocalStorage.getItem("featureFlags")
+      if (storedFlags) {
+        try {
+          setFlags(JSON.parse(storedFlags))
+        } catch (e) {
+          console.error("Failed to parse stored feature flags", e)
+        }
       }
+
+      setIsInitialized(true)
+    } catch (error) {
+      console.error("Error initializing feature flags:", error)
+      // Fallback to empty array to prevent crashes
+      setFlags([])
+      setIsInitialized(true)
     }
-  }, [])
+  }, [initialFlags])
 
   // Save flags to localStorage whenever they change
   useEffect(() => {
-    localStorage.setItem("featureFlags", JSON.stringify(flags))
-  }, [flags])
+    if (isInitialized && flags.length > 0) {
+      safeLocalStorage.setItem("featureFlags", JSON.stringify(flags))
+    }
+  }, [flags, isInitialized])
 
   const isFeatureEnabled = (featureId: string) => {
     const flag = flags.find((f) => f.id === featureId)
