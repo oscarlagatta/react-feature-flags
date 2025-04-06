@@ -1,3 +1,5 @@
+"use client"
+
 import { useState, useMemo } from "react"
 import { useFeatureFlags } from "@/lib/feature-flags/context"
 import type { FeatureFlag } from "@/lib/feature-flags/types"
@@ -8,7 +10,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu"
 import {
   ChevronDown,
   ChevronUp,
@@ -41,6 +43,9 @@ export function EnhancedFlagVisualization() {
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc")
   const [showFilters, setShowFilters] = useState(false)
 
+  // Dropdown states
+  const [openDropdowns, setOpenDropdowns] = useState<Record<string, boolean>>({})
+
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1)
   const [pageSize, setPageSize] = useState(5)
@@ -48,6 +53,14 @@ export function EnhancedFlagVisualization() {
   const [selectedFlag, setSelectedFlag] = useState<FeatureFlag | null>(null)
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false)
+
+  // Toggle dropdown state
+  const toggleDropdown = (id: string) => {
+    setOpenDropdowns((prev) => ({
+      ...prev,
+      [id]: !prev[id],
+    }))
+  }
 
   // Extract all unique categories from flags
   const categories = useMemo(() => {
@@ -432,21 +445,24 @@ export function EnhancedFlagVisualization() {
                       </TableCell>
                       <TableCell>{flag.description}</TableCell>
                       <TableCell className="text-right">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon">
-                              <MoreHorizontal className="h-4 w-4" />
-                              <span className="sr-only">Actions</span>
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => toggleFeature(flag.id)}>
-                              {flag.enabled ? "Disable" : "Enable"}
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => handleEdit(flag)}>Edit</DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => handleViewDetails(flag)}>View Details</DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                        <div className="relative">
+                          <Button variant="ghost" size="icon" onClick={() => toggleDropdown(flag.id)}>
+                            <MoreHorizontal className="h-4 w-4" />
+                            <span className="sr-only">Actions</span>
+                          </Button>
+
+                          {openDropdowns[flag.id] && (
+                              <DropdownMenu>
+                                <DropdownMenuContent align="end" onInteractOutside={() => toggleDropdown(flag.id)}>
+                                  <DropdownMenuItem onClick={() => toggleFeature(flag.id)}>
+                                    {flag.enabled ? "Disable" : "Enable"}
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem onClick={() => handleEdit(flag)}>Edit</DropdownMenuItem>
+                                  <DropdownMenuItem onClick={() => handleViewDetails(flag)}>View Details</DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                          )}
+                        </div>
                       </TableCell>
                     </TableRow>
                 ))
@@ -482,21 +498,29 @@ export function EnhancedFlagVisualization() {
                         </p>
                       </div>
                       <div className="flex items-center gap-1 absolute top-4 right-4">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-8 w-8">
-                              <MoreHorizontal className="h-4 w-4" />
-                              <span className="sr-only">Actions</span>
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => toggleFeature(flag.id)}>
-                              {flag.enabled ? "Disable" : "Enable"}
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => handleEdit(flag)}>Edit</DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => handleViewDetails(flag)}>View Details</DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                        <div className="relative">
+                          <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8"
+                              onClick={() => toggleDropdown(`grid-${flag.id}`)}
+                          >
+                            <MoreHorizontal className="h-4 w-4" />
+                            <span className="sr-only">Actions</span>
+                          </Button>
+
+                          {openDropdowns[`grid-${flag.id}`] && (
+                              <DropdownMenu>
+                                <DropdownMenuContent align="end" onInteractOutside={() => toggleDropdown(`grid-${flag.id}`)}>
+                                  <DropdownMenuItem onClick={() => toggleFeature(flag.id)}>
+                                    {flag.enabled ? "Disable" : "Enable"}
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem onClick={() => handleEdit(flag)}>Edit</DropdownMenuItem>
+                                  <DropdownMenuItem onClick={() => handleViewDetails(flag)}>View Details</DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                          )}
+                        </div>
                         <Switch
                             id={`grid-flag-${flag.id}`}
                             checked={flag.enabled}
@@ -562,21 +586,29 @@ export function EnhancedFlagVisualization() {
                                 checked={flag.enabled}
                                 onCheckedChange={() => toggleFeature(flag.id)}
                             />
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="icon" className="h-8 w-8 ml-2">
-                                  <MoreHorizontal className="h-4 w-4" />
-                                  <span className="sr-only">Actions</span>
-                                </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end">
-                                <DropdownMenuItem onClick={() => toggleFeature(flag.id)}>
-                                  {flag.enabled ? "Disable" : "Enable"}
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => handleEdit(flag)}>Edit</DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => handleViewDetails(flag)}>View Details</DropdownMenuItem>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
+                            <div className="relative">
+                              <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-8 w-8 ml-2"
+                                  onClick={() => toggleDropdown(`list-${flag.id}`)}
+                              >
+                                <MoreHorizontal className="h-4 w-4" />
+                                <span className="sr-only">Actions</span>
+                              </Button>
+
+                              {openDropdowns[`list-${flag.id}`] && (
+                                  <DropdownMenu>
+                                    <DropdownMenuContent align="end" onInteractOutside={() => toggleDropdown(`list-${flag.id}`)}>
+                                      <DropdownMenuItem onClick={() => toggleFeature(flag.id)}>
+                                        {flag.enabled ? "Disable" : "Enable"}
+                                      </DropdownMenuItem>
+                                      <DropdownMenuItem onClick={() => handleEdit(flag)}>Edit</DropdownMenuItem>
+                                      <DropdownMenuItem onClick={() => handleViewDetails(flag)}>View Details</DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                  </DropdownMenu>
+                              )}
+                            </div>
                           </div>
                         </div>
                     ))}

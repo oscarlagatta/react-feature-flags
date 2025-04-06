@@ -1,13 +1,8 @@
+"use client"
+
 import { useFeatureFlags } from "@/lib/feature-flags/context"
 import { Button } from "@/components/ui/button"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { useState } from "react"
@@ -27,14 +22,14 @@ export function FeatureFlagDialog() {
 
   return (
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogTrigger asChild>
-          <Button variant="outline" size="icon" className="relative" title="Feature Flags">
+        <div>
+          <Button variant="outline" size="icon" className="relative" title="Feature Flags" onClick={() => setOpen(true)}>
             <Settings className="h-[1.2rem] w-[1.2rem]" />
             <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] text-primary-foreground">
             {flags.filter((flag) => flag.enabled).length}
           </span>
           </Button>
-        </DialogTrigger>
+        </div>
         <DialogContent className="sm:max-w-[95vw] md:max-w-[1000px] lg:max-w-[1200px] w-full max-h-[95vh]">
           <DialogHeader>
             <DialogTitle>Feature Flag Management</DialogTitle>
